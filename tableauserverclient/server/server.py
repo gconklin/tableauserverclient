@@ -1,3 +1,4 @@
+from datetime import timedelta
 from tableauserverclient.helpers.logging import logger
 
 import requests
@@ -144,10 +145,15 @@ class Server(object):
         self._auth_token = None
         self._session = self._session_factory()
 
-    def _set_auth(self, site_id, user_id, auth_token):
+    def _set_auth(self, site_id, user_id, auth_token, pat_expires=None):
         self._site_id = site_id
         self._user_id = user_id
         self._auth_token = auth_token
+        if pat_expires:
+            days, hours, minutes = pat_expires.split(":")
+            self._pat_expires = timedelta(days=int(days), hours=int(hours), minutes=int(minutes))
+        else:
+            self._pat_expires = None
 
     def _get_legacy_version(self):
         # the serverInfo call was introduced in 2.4, earlier than that we have this different call
@@ -223,6 +229,13 @@ class Server(object):
             error = "Missing user ID. You must sign in first."
             raise NotSignedInError(error)
         return self._user_id
+
+    @property
+    def pat_expires(self):
+        if self._pat_expires is None:
+            error = "Missing personal access token info. Must sign in with a personal access token."
+            raise NotSignedInError(error)
+        return self._pat_expires
 
     @property
     def server_address(self):

@@ -62,7 +62,8 @@ class Auth(Endpoint):
         site_id = parsed_response.find(".//t:site", namespaces=self.parent_srv.namespace).get("id", None)
         user_id = parsed_response.find(".//t:user", namespaces=self.parent_srv.namespace).get("id", None)
         auth_token = parsed_response.find("t:credentials", namespaces=self.parent_srv.namespace).get("token", None)
-        self.parent_srv._set_auth(site_id, user_id, auth_token)
+        pat_expires = parsed_response.find(".//t:credentials", namespaces=self.parent_srv.namespace).get("estimatedTimeToExpiration", None)
+        self.parent_srv._set_auth(site_id, user_id, auth_token, pat_expires)
         logger.info("Signed into {0} as user with id {1}".format(self.parent_srv.server_address, user_id))
         return Auth.contextmgr(self.sign_out)
 
@@ -103,7 +104,8 @@ class Auth(Endpoint):
         site_id = parsed_response.find(".//t:site", namespaces=self.parent_srv.namespace).get("id", None)
         user_id = parsed_response.find(".//t:user", namespaces=self.parent_srv.namespace).get("id", None)
         auth_token = parsed_response.find("t:credentials", namespaces=self.parent_srv.namespace).get("token", None)
-        self.parent_srv._set_auth(site_id, user_id, auth_token)
+        pat_expires = parsed_response.find(".//t:credentials", namespaces=self.parent_srv.namespace).get("estimatedTimeToExpiration", None)
+        self.parent_srv._set_auth(site_id, user_id, auth_token, pat_expires)
         logger.info("Signed into {0} as user with id {1}".format(self.parent_srv.server_address, user_id))
         return Auth.contextmgr(self.sign_out)
 
